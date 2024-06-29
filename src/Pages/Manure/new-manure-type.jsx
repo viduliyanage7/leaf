@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StackPlus, Plus } from '@phosphor-icons/react';
 import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
@@ -6,39 +6,75 @@ import { FaPlus } from "react-icons/fa6";
 import { Input } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const Newmanuretype = (props) => {
     const { handleClicksucess, handleClickerr, setMessage } = props;
-
+    const location = useLocation();
+    const { row } = location.state || {};
+    const [id, setId] = useState('');
     const [manurename, setManurename] = useState('');
     const [manureprice, setManureprice] = useState('');
     const [quantity, setQuantity] = useState('');
+    const [bttext, setBttext] = useState('');
+    useEffect(() => {
+        try {
+            if (row.id > 0) {
+                setId(row.id)
+                setManurename(row.name)
+                setManureprice(row.price)
+                setQuantity(row.qty)
+                setBttext('Update')
+            }
+        } catch {
+            setBttext('Add')
+        }
+    }, []);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
 
         const newData = {
+            id: id,
             manurename: manurename,
             quantity: quantity,
             manureprice: manureprice,
         };
-
-        try {
-            const response = await axios.post('http://web.liyontatea.com/api/add_new_manure_type', newData);
-            setManurename('');
-            setManureprice('');
-            if (response.data.message === 'successfull') {
-                setMessage('Record added successfully');
-                handleClicksucess();
-            } else {
-                setMessage('Error adding data');
+        if (id > 0) {
+            try {
+                const response = await axios.post('http://web.liyontatea.com/api/update_manure_type', newData);
+                console.log(response.data.message)
+                if (response.data.message === 'Update successful') {
+                    setMessage('Record added successfully');
+                    handleClicksucess();
+                } else {
+                    setMessage('Error adding data');
+                    handleClickerr();
+                }
+            } catch (error) {
+                setMessage('Error sending data to backend');
                 handleClickerr();
             }
-        } catch (error) {
-            setMessage('Error sending data to backend');
-            handleClickerr();
+        } else {
+            try {
+                const response = await axios.post('http://web.liyontatea.com/api/add_new_manure_type', newData);
+                if (response.data.message === 'successfull') {
+                    setMessage('Record added successfully');
+                    handleClicksucess();
+                } else {
+                    setMessage('Error adding data');
+                    handleClickerr();
+                }
+            } catch (error) {
+                setMessage('Error sending data to backend');
+                handleClickerr();
+            }
         }
+        setManurename('');
+        setManureprice('');
+        setQuantity('');
+        setId('')
     };
 
     const navigate = useNavigate();
@@ -84,8 +120,8 @@ const Newmanuretype = (props) => {
                     </div>
                     <hr />
                     <div className='grid justify-items-stretch'>
-                        <button onClick={handleFormSubmit} className="mt-5 flex ml-100 items-center justify-center justify-self-end bg-[#209F20] w-[92px] h-[41px] rounded-md text-white ">
-                            <FaPlus size={15} />&nbsp;&nbsp;Add
+                        <button onClick={handleFormSubmit} className="mt-5 flex ml-100 items-center justify-center justify-self-end bg-[#209F20] w-[102px] h-[41px] rounded-md text-white ">
+                            <FaPlus size={15} />&nbsp;&nbsp;{bttext}
                         </button>
                     </div>
                 </div>

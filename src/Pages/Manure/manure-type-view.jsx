@@ -12,19 +12,40 @@ import TableRow from '@mui/material/TableRow';
 import { styled } from '@mui/material/styles';
 import { RiEditBoxLine, RiDeleteBinLine } from "react-icons/ri";
 import { Button, Grid, IconButton } from '@mui/material';
-
-const Manuretypeview = () => {
+import { Modal } from 'antd';
+import { MdErrorOutline } from "react-icons/md";
+const Manuretypeview = (props) => {
+    const { handleClicksucess, handleClickerr, setMessage } = props;
     const [tableData, setTableData] = useState([]);
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [id, setId] = useState('');
     const [rowcount, setRowcount] = useState(10);
-
-    const [editRowData, setEditRowData] = useState(null);
-    const [editRowIndex, setEditRowIndex] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const showModal = (row) => {
+        setId(row.id)
+        setOpen(true);
+    };
+    const handleOk = () => {
+        setConfirmLoading(true);
+        setTimeout(() => {
+            setOpen(false);
+            setConfirmLoading(false);
+        }, 2000);
+    };
+    const handleCancel = () => {
+        console.log('Clicked cancel button');
+        setOpen(false);
+    };
     const navigate = useNavigate();
 
-    const handleClick = (row) => {
+    const handleClick = () => {
         navigate('/New-manure-type');
+    };
+
+    const editClick = (row) => {
+        navigate('/New-manure-type', { state: { row } });
+
     };
 
     useEffect(() => {
@@ -39,12 +60,25 @@ const Manuretypeview = () => {
             console.error('Error fetching data:', error);
         }
     };
-
-    const handleEditClick = (row, index) => {
-        setEditRowData({ ...row });
-        setEditRowIndex(index);
-        setEditDialogOpen(true);
+    const deletedata = async () => {
+        try {
+            const response = await axios.post('http://web.liyontatea.com/api/delete_manure_type', { id });
+            if (response.data.message === 'Update successful') {
+                setMessage('Record added successfully');
+                handleClicksucess();
+                handleCancel();
+                setTableData([])
+                fetchData();
+            } else {
+                setMessage('Error adding data');
+                handleClickerr();
+            }
+        } catch (error) {
+            setMessage('Error sending data to backend');
+            handleClickerr();
+        }
     };
+
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
@@ -76,6 +110,27 @@ const Manuretypeview = () => {
             <div className="bg-green-800 h-16 w-full flex items-center pl-4">
                 <p className="text-[20px] text-white mt-0 flex ml-2">Manure Types</p>
             </div>
+            <Modal
+                open={open}
+                onOk={handleOk}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}
+                footer={[
+                    <button
+                        className='w-[94px] mr-5 h-[40px] rounded-3xl border border-gray-500 text-gray-500 hover:bg-gray-100'
+                        onClick={handleCancel}
+                    >
+                        Cancel
+                    </button>,
+                    <button onClick={deletedata} className='bg-[#B43236] w-[71px] h-[40px] rounded-3xl text-white' >
+                        Yes
+                    </button>,
+                ]}
+            >
+                <div className='flex'> <MdErrorOutline size={26} className='mt-1 mr-2' /> <p className='text-[20px] mt-[1px]'>Are You Sure ?</p></div>
+                <p className='mt-5'>You are trying to delete this record and will not be able to recover them.</p>
+                <p className='mt-5 font-semibold'>Do you wish to proceed?</p>
+            </Modal>
             <div className="bg-green-800 h-18 -m-2"></div>
             <br />
             <div className="flex justify-center">
@@ -133,10 +188,10 @@ const Manuretypeview = () => {
                                     <StyledTableCell>{row.price}</StyledTableCell>
                                     <StyledTableCell>{row.qty}</StyledTableCell>
                                     <StyledTableCell align="right">
-                                        <IconButton onClick={() => handleClick(row)}>
+                                        <IconButton onClick={() => editClick(row)}>
                                             <RiEditBoxLine size={22} style={{ color: '#3cab3b' }} />
                                         </IconButton>
-                                        <IconButton onClick={() => handleEditClick(row, index)}>
+                                        <IconButton onClick={() => showModal(row)}>
                                             <RiDeleteBinLine size={22} style={{ color: '#ad2c2d' }} />
                                         </IconButton>
                                     </StyledTableCell>
