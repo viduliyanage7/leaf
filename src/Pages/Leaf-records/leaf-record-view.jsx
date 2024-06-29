@@ -6,14 +6,15 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {  Button, Grid, TextField, IconButton, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Grid, TextField, IconButton, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { DatePicker } from 'antd';
 import { MdEdit } from "react-icons/md";
 import { styled } from '@mui/material/styles';
 import { RiEditBoxLine } from "react-icons/ri";
 import { RiDeleteBinLine } from "react-icons/ri";
 
-const Leafrecordview = () => {
+const Leafrecordview = (props) => {
+  const { handleClicksucess, handleClickerr, setMessage } = props;
   const [tableData, setTableData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -25,7 +26,8 @@ const Leafrecordview = () => {
       const response = await axios.post('http://web.liyontatea.com/api/leaf_records_get', { date: selectedDate });
       setTableData(response.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      setMessage('Error sending data to backend');
+      handleClickerr();
     }
   };
 
@@ -61,7 +63,7 @@ const Leafrecordview = () => {
       fontSize: 14,
     },
   }));
-  
+
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
       backgroundColor: '#f7fef6',
@@ -118,10 +120,10 @@ const Leafrecordview = () => {
               <StyledTableCell>{row.net_weight}</StyledTableCell>
               <StyledTableCell>
                 <IconButton onClick={() => handleEditClick(row, index)}>
-                  <RiEditBoxLine size={22} style={{color:'#3cab3b'}}/>
+                  <RiEditBoxLine size={22} style={{ color: '#3cab3b' }} />
                 </IconButton>
                 <IconButton onClick={() => handleEditClick(row, index)}>
-                  <RiDeleteBinLine size={22} style={{color:'#ad2c2d'}}/>
+                  <RiDeleteBinLine size={22} style={{ color: '#ad2c2d' }} />
                 </IconButton>
               </StyledTableCell>
             </StyledTableRow>

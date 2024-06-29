@@ -19,6 +19,7 @@ const Manuretypeview = (props) => {
     const [tableData, setTableData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [id, setId] = useState('');
+    const [term, SetTerm] = useState('');
     const [rowcount, setRowcount] = useState(10);
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -26,6 +27,10 @@ const Manuretypeview = (props) => {
         setId(row.id)
         setOpen(true);
     };
+    const handleChange = async (event) => {
+        SetTerm(event.target.value);
+    };
+
     const handleOk = () => {
         setConfirmLoading(true);
         setTimeout(() => {
@@ -73,6 +78,15 @@ const Manuretypeview = (props) => {
                 setMessage('Error adding data');
                 handleClickerr();
             }
+        } catch (error) {
+            setMessage('Error sending data to backend');
+            handleClickerr();
+        }
+    };
+    const searchdata = async () => {
+        try {
+            const response = await axios.post('http://web.liyontatea.com/api/manure_type_search', { term });
+            setTableData(response.data);
         } catch (error) {
             setMessage('Error sending data to backend');
             handleClickerr();
@@ -153,12 +167,14 @@ const Manuretypeview = (props) => {
                                 entries
                             </p>
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={5} className='flex'>
                             <Input
                                 placeholder="Search..."
                                 className="h-10"
-                                prefix={<IoSearch className="text-gray-600" size={18} />}
+                                onChange={handleChange}
+                                value={term}
                             />
+                            <button onClick={searchdata}                         className='w-[54px] ml-5 h-[40px] rounded-xl border border-gray-500 text-gray-500 hover:bg-gray-100'>  <IoSearch className="ml-2 text-gray-600" size={22} /></button>
                         </Grid>
                         <Grid item xs={3}>
                             <button onClick={handleClick} className="items-center justify-center flex ml-100 bg-[#209F20] w-[122px] h-[41px] rounded-md text-white ">
