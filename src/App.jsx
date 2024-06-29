@@ -6,16 +6,14 @@ import Leafrecordsindex from './Pages/Leaf-records';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import Leafrecordsimportcsv from './Pages/Leaf-records/leaf-records-csv';
 import Suppliersindex from './Pages/Suppliers';
 import Agentsindex from './Pages/Agents';
 import Newmanuretype from './Pages/Manure/new-manure-type';
 import Manuretypeview from './Pages/Manure/manure-type-view';
 
-
 function App() {
-  const [opensucess, Opensucess] = React.useState(false);
-  const [openerr, Openerr] = React.useState(false);
+  const [opensucess, Opensucess] = useState(false);
+  const [openerr, Openerr] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleClicksucess = () => {
@@ -49,7 +47,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="appmaindiv">
-<Sidebar/>
+        <Sidebar className="sidebar" />
         <div className="content">
           <Routes>
             <Route path="/leaf-records" element={<Leafrecordsindex setMessage={setMessage} handleClicksucess={handleClicksucess} handleClickerr={handleClickerr} />} />
@@ -57,38 +55,32 @@ function App() {
             <Route path="/Agents" element={<Agentsindex setMessage={setMessage} handleClicksucess={handleClicksucess} handleClickerr={handleClickerr} />} />
             <Route path="/New-manure-type" element={<Newmanuretype setMessage={setMessage} handleClicksucess={handleClicksucess} handleClickerr={handleClickerr} />} />
             <Route path="/Manure-type-view" element={<Manuretypeview setMessage={setMessage} handleClicksucess={handleClicksucess} handleClickerr={handleClickerr} />} />
-            
-
           </Routes>
         </div>
-        <center>
-          <Snackbar
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            className="alertmain"
-            open={opensucess}
-            onClose={handleClosesucess}
-          >
-            <Stack sx={{ width: '100%' }} spacing={2}>
-              <Alert variant="filled" severity="success">
-                {message}
-              </Alert>
-            </Stack>
-          </Snackbar>
-        </center>
-        <center>
-          <Snackbar
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            className="alertmain"
-            open={openerr}
-            onClose={handleCloseerr}
-          >
-            <Stack sx={{ width: '100%' }} spacing={2}>
-              <Alert variant="filled" severity="error">
-                {message}
-              </Alert>
-            </Stack>
-          </Snackbar>
-        </center>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          className="alertmain"
+          open={opensucess}
+          onClose={handleClosesucess}
+        >
+          <Stack sx={{ width: '100%' }} spacing={2}>
+            <Alert variant="filled" severity="success">
+              {message}
+            </Alert>
+          </Stack>
+        </Snackbar>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          className="alertmain"
+          open={openerr}
+          onClose={handleCloseerr}
+        >
+          <Stack sx={{ width: '100%' }} spacing={2}>
+            <Alert variant="filled" severity="error">
+              {message}
+            </Alert>
+          </Stack>
+        </Snackbar>
       </div>
     </BrowserRouter>
   );
